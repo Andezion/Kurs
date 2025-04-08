@@ -1,16 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
 
 <?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.kurs.HelloController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-    </padding>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.control.TextField?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.kurs.ShowKurs">
+    <left>
+        <VBox spacing="10" style="-fx-background-color: #d3d3d3; -fx-padding: 10;" prefWidth="200">
+            <Label text="Выбор валют:" />
+            <ComboBox fx:id="fromCurrencyBox" promptText="Из валюты" />
+            <ComboBox fx:id="toCurrencyBox" promptText="В валюту" />
 
-    <Label fx:id="welcomeText"/>
-    <Button text="Hello!" onAction="#onHelloButtonClick"/>
-</VBox>
+            <Label text="Период:" />
+            <ComboBox fx:id="periodBox" promptText="Выбрать период" />
+
+            <TextField fx:id="daysField" promptText="Введите количество дней" />
+
+            <Label text="Дата:" />
+            <DatePicker fx:id="specificDatePicker" />
+
+            <Label text="Период от:" />
+            <DatePicker fx:id="startDatePicker" />
+            <Label text="до:" />
+            <DatePicker fx:id="endDatePicker" />
+
+            <Button text="Показать курс" onAction="#onUpdateButtonClick" />
+        </VBox>
+    </left>
+    <center>
+        <VBox spacing="10" style="-fx-padding: 10;">
+            <TextArea fx:id="resultArea" editable="false" wrapText="true" />
+            <LineChart fx:id="rateChart" prefHeight="400" prefWidth="600"
+                       title="График курса"
+                       xmlns:fx="http://javafx.com/fxml"
+                       xmlns="http://javafx.com/javafx">
+                <xAxis>
+                    <CategoryAxis label="Дата" />
+                </xAxis>
+                <yAxis>
+                    <NumberAxis label="Курс" />
+                </yAxis>
+            </LineChart>
+        </VBox>
+    </center>
+</BorderPane>

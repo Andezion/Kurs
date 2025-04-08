@@ -13,8 +13,8 @@ public class Kurs extends Application
     public void start(Stage stage) throws IOException
     {
         FXMLLoader fxmlLoader = new FXMLLoader(Kurs.class.getResource("hello-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 600, 400);
-        stage.setTitle("Hello!");
+        Scene scene = new Scene(fxmlLoader.load(), 1000, 600);
+        stage.setTitle("roma topchik");
         stage.setScene(scene);
         stage.show();
     }
