@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class Kurs extends Application
 {
@@ -14,6 +15,8 @@ public class Kurs extends Application
     {
         FXMLLoader fxmlLoader = new FXMLLoader(Kurs.class.getResource("hello-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1000, 600);
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(
+                "/com/example/kurs/my_style.css")).toExternalForm());
         stage.setTitle("roma topchik");
         stage.setScene(scene);
         stage.show();

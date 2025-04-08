@@ -2,7 +2,9 @@ package com.example.kurs;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import org.json.JSONArray;
@@ -164,6 +166,9 @@ public class ShowKurs
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Курс " + currency + " к PLN");
 
+        double min = Double.MAX_VALUE;
+        double max = Double.MIN_VALUE;
+
         for (int i = 0; i < rates.length(); i++)
         {
             JSONObject rateObj = rates.getJSONObject(i);
@@ -171,7 +176,24 @@ public class ShowKurs
             double value = rateObj.getDouble("mid");
 
             series.getData().add(new XYChart.Data<>(date, value));
+
+            if (value < min) min = value;
+            if (value > max) max = value;
         }
+
+        // Настройка Y оси
+        NumberAxis yAxis = (NumberAxis) rateChart.getYAxis();
+        double padding = (max - min) * 0.1; // 10% от разницы
+        if (padding == 0) padding = 0.01;   // Минимальный паддинг, если курс не менялся вообще
+        yAxis.setAutoRanging(false);
+        yAxis.setLowerBound(min - padding);
+        yAxis.setUpperBound(max + padding);
+        yAxis.setTickUnit((max - min + 2 * padding) / 5); // 5 делений, можно настроить
+
+        // X ось с поворотом дат
+        CategoryAxis xAxis = (CategoryAxis) rateChart.getXAxis();
+        xAxis.setTickLabelsVisible(false);
+        xAxis.setTickMarkVisible(false);
 
         rateChart.getData().add(series);
     }

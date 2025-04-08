@@ -1,0 +1,38 @@
+.vbox-sidebar
+{
+    -fx-background-color: linear-gradient(to bottom, #e0e0e0, #cfcfcf);
+    -fx-padding: 15;
+    -fx-spacing: 12;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #b0b0b0;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(three-pass-box, rgb(4, 4, 4), 8, 0, 0, 2);
+}
+
+.vbox-sidebar Label
+{
+    -fx-font-weight: bold;
+    -fx-text-fill: #000000;
+}
+
+.vbox-sidebar ComboBox,
+.vbox-sidebar TextField,
+.vbox-sidebar DatePicker
+{
+    -fx-pref-width: 180;
+    -fx-background-radius: 5;
+}
+
+.vbox-sidebar Button
+{
+    -fx-background-color: #b1abab;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.vbox-sidebar Button:hover
+{
+    -fx-background-color: #706a6a;
+}

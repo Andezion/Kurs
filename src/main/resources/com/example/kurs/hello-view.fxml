@@ -12,9 +12,12 @@
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.control.TextField?>
+
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.kurs.ShowKurs">
     <left>
-        <VBox spacing="10" style="-fx-background-color: #d3d3d3; -fx-padding: 10;" prefWidth="200">
+        <VBox spacing="10"
+              styleClass="vbox-sidebar"
+              prefWidth="200">
             <Label text="Выбор валют:" />
             <ComboBox fx:id="fromCurrencyBox" promptText="Из валюты" />
             <ComboBox fx:id="toCurrencyBox" promptText="В валюту" />
@@ -34,6 +37,7 @@
 
             <Button text="Показать курс" onAction="#onUpdateButtonClick" />
         </VBox>
+
     </left>
     <center>
         <VBox spacing="10" style="-fx-padding: 10;">
