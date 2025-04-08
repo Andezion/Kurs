@@ -55,12 +55,16 @@ public class ShowKurs
             String selected = periodBox.getValue();
             boolean isDate = selected.equals("За дату");
             boolean isRange = selected.equals("Произвольный период");
+            boolean isNDays = selected.equals("Последние N дней");
 
+            daysField.setDisable(!isNDays);
             specificDatePicker.setDisable(!isDate);
             startDatePicker.setDisable(!isRange);
             endDatePicker.setDisable(!isRange);
         });
 
+
+        daysField.setDisable(true);
         specificDatePicker.setDisable(true);
         startDatePicker.setDisable(true);
         endDatePicker.setDisable(true);
