@@ -18,24 +18,24 @@
         <VBox spacing="10"
               styleClass="vbox-sidebar"
               prefWidth="200">
-            <Label text="Выбор валют:" />
-            <ComboBox fx:id="fromCurrencyBox" promptText="Из валюты" />
-            <ComboBox fx:id="toCurrencyBox" promptText="В валюту" />
+            <Label text="Currency selection:" />
+            <ComboBox fx:id="fromCurrencyBox" promptText="From the currency" />
+            <ComboBox fx:id="toCurrencyBox" promptText="In currency" />
 
-            <Label text="Период:" />
-            <ComboBox fx:id="periodBox" promptText="Выбрать период" />
+            <Label text="Period:" />
+            <ComboBox fx:id="periodBox" promptText="Pick period" />
 
-            <TextField fx:id="daysField" promptText="Введите количество дней" />
+            <TextField fx:id="daysField" promptText="Enter number of days" />
 
-            <Label text="Дата:" />
+            <Label text="Date:" />
             <DatePicker fx:id="specificDatePicker" />
 
-            <Label text="Период от:" />
+            <Label text="Period from:" />
             <DatePicker fx:id="startDatePicker" />
-            <Label text="до:" />
+            <Label text="to:" />
             <DatePicker fx:id="endDatePicker" />
 
-            <Button text="Показать курс" onAction="#onUpdateButtonClick" />
+            <Button text="Show" onAction="#onUpdateButtonClick" />
         </VBox>
 
     </left>
@@ -43,14 +43,14 @@
         <VBox spacing="10" style="-fx-padding: 10;">
             <TextArea fx:id="resultArea" editable="false" wrapText="true" />
             <LineChart fx:id="rateChart" prefHeight="400" prefWidth="600"
-                       title="График курса"
+                       title="Exchange rate chart"
                        xmlns:fx="http://javafx.com/fxml"
                        xmlns="http://javafx.com/javafx">
                 <xAxis>
-                    <CategoryAxis label="Дата" />
+                    <CategoryAxis label="Date" />
                 </xAxis>
                 <yAxis>
-                    <NumberAxis label="Курс" />
+                    <NumberAxis label="Money" />
                 </yAxis>
             </LineChart>
         </VBox>
