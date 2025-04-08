@@ -46,18 +46,19 @@ public class ShowKurs
     {
         fromCurrencyBox.getItems().addAll("EUR", "USD", "GBP", "CHF", "JPY");
         toCurrencyBox.getItems().addAll("PLN");
-        periodBox.getItems().addAll("Сейчас", "Сегодня", "Последние N дней", "За дату", "Произвольный период");
+        periodBox.getItems().addAll("Now", "Today", "Last N days", "For the date", "Custom period");
 
         fromCurrencyBox.setValue("EUR");
         toCurrencyBox.setValue("PLN");
 
         periodBox.setValue("Pick");
 
-        periodBox.setOnAction(e -> {
+        periodBox.setOnAction(e ->
+        {
             String selected = periodBox.getValue();
-            boolean isDate = selected.equals("За дату");
-            boolean isRange = selected.equals("Произвольный период");
-            boolean isNDays = selected.equals("Последние N дней");
+            boolean isDate = selected.equals("For the date");
+            boolean isRange = selected.equals("Custom period");
+            boolean isNDays = selected.equals("Last N days");
 
             daysField.setDisable(!isNDays);
             specificDatePicker.setDisable(!isDate);
@@ -91,13 +92,13 @@ public class ShowKurs
 
             switch (period)
             {
-                case "Сейчас":
+                case "Now":
                     result = getCurrentRate(from);
                     break;
-                case "Сегодня":
+                case "Today":
                     result = getTodayRate(from);
                     break;
-                case "Последние N дней":
+                case "Last N days":
                     String text = daysField.getText();
                     if (text != null && !text.isEmpty())
                     {
@@ -107,7 +108,7 @@ public class ShowKurs
 
                             if(days <= 0)
                             {
-                                result = "u dumb fuck";
+                                result = "Integer should be > 0";
                             }
                             else
                             {
@@ -116,15 +117,15 @@ public class ShowKurs
                         }
                         catch (NumberFormatException e)
                         {
-                            result = "Введите корректное число дней.";
+                            result = "Enter an integer";
                         }
                     }
                     else
                     {
-                        result = "Поле для дней пустое.";
+                        result = "Field for days is empty";
                     }
                     break;
-                case "За дату":
+                case "For the date":
                     if (specificDatePicker.getValue() != null)
                     {
                         String date = specificDatePicker.getValue().toString();
@@ -135,7 +136,7 @@ public class ShowKurs
                         result = "Выберите дату.";
                     }
                     break;
-                case "Произвольный период":
+                case "Custom period":
                     if (startDatePicker.getValue() != null && endDatePicker.getValue() != null)
                     {
                         String start = startDatePicker.getValue().toString();
@@ -144,19 +145,19 @@ public class ShowKurs
                     }
                     else
                     {
-                        result = "Выберите обе даты периода.";
+                        result = "Select both dates";
                     }
                     break;
 
                 default:
-                    result = "Период не выбран.";
+                    result = "Period is not selected";
             }
 
             resultArea.setText(result);
         }
         catch (IOException e)
         {
-            resultArea.setText("Ошибка при получении данных: " + e.getMessage());
+            resultArea.setText("Error: " + e.getMessage());
         }
     }
 
@@ -164,7 +165,7 @@ public class ShowKurs
     {
         rateChart.getData().clear();
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Курс " + currency + " к PLN");
+        series.setName("Exchange rate " + currency + " to PLN");
 
         double min = Double.MAX_VALUE;
         double max = Double.MIN_VALUE;
@@ -181,16 +182,16 @@ public class ShowKurs
             if (value > max) max = value;
         }
 
-        // Настройка Y оси
         NumberAxis yAxis = (NumberAxis) rateChart.getYAxis();
-        double padding = (max - min) * 0.1; // 10% от разницы
-        if (padding == 0) padding = 0.01;   // Минимальный паддинг, если курс не менялся вообще
+        double padding = (max - min) * 0.1;
+        if (padding == 0) padding = 0.01;
+
         yAxis.setAutoRanging(false);
+
         yAxis.setLowerBound(min - padding);
         yAxis.setUpperBound(max + padding);
-        yAxis.setTickUnit((max - min + 2 * padding) / 5); // 5 делений, можно настроить
+        yAxis.setTickUnit((max - min + 2 * padding) / 5);
 
-        // X ось с поворотом дат
         CategoryAxis xAxis = (CategoryAxis) rateChart.getXAxis();
         xAxis.setTickLabelsVisible(false);
         xAxis.setTickMarkVisible(false);
@@ -206,7 +207,7 @@ public class ShowKurs
 
         updateChart(rates, currency);
 
-        StringBuilder result = new StringBuilder("Курс " + currency + " к PLN за период:\n");
+        StringBuilder result = new StringBuilder("Exchange rate " + currency + " to PLN for period:\n");
         for (int i = 0; i < rates.length(); i++)
         {
             JSONObject rateObj = rates.getJSONObject(i);
@@ -223,7 +224,7 @@ public class ShowKurs
         String url = "https://api.nbp.pl/api/exchangerates/rates/a/" + currency.toLowerCase() + "/" + date + "/?format=json";
         JSONObject json = getJsonObject(url);
         JSONObject rate = json.getJSONArray("rates").getJSONObject(0);
-        return "Курс " + currency + " к PLN на " + rate.getString("effectiveDate") + ": " + rate.getDouble("mid") + " PLN";
+        return "Exchange rate " + currency + " to PLN on " + rate.getString("effectiveDate") + ": " + rate.getDouble("mid") + " PLN";
     }
 
     private String getCurrentRate(String currency) throws IOException
@@ -231,7 +232,7 @@ public class ShowKurs
         String url = "https://api.nbp.pl/api/exchangerates/rates/a/" + currency.toLowerCase() + "/today/?format=json";
         JSONObject json = getJsonObject(url);
         JSONObject rate = json.getJSONArray("rates").getJSONObject(0);
-        return "Курс " + currency + " к PLN на сейчас: " + rate.getDouble("mid") + " PLN";
+        return "Current rate " + currency + " to PLN: " + rate.getDouble("mid") + " PLN";
     }
 
     private String getTodayRate(String currency) throws IOException
@@ -239,7 +240,7 @@ public class ShowKurs
         String url = "https://api.nbp.pl/api/exchangerates/rates/a/" + currency.toLowerCase() + "/?format=json";
         JSONObject json = getJsonObject(url);
         JSONObject rate = json.getJSONArray("rates").getJSONObject(0);
-        return "Курс " + currency + " к PLN на " + rate.getString("effectiveDate") + ": " + rate.getDouble("mid") + " PLN";
+        return "Exchange rate " + currency + " to PLN on today: " + rate.getDouble("mid") + " PLN";
     }
 
     private String getLastNDaysRates(String currency, int days) throws IOException
@@ -250,7 +251,7 @@ public class ShowKurs
 
         updateChart(rates, currency);
 
-        StringBuilder result = new StringBuilder("Курс " + currency + " к PLN за последние " + days + " дней:\n");
+        StringBuilder result = new StringBuilder("Exchange rate " + currency + " to PLN last " + days + " days:\n");
         for (int i = 0; i < rates.length(); i++)
         {
             JSONObject rateObj = rates.getJSONObject(i);
@@ -271,7 +272,7 @@ public class ShowKurs
         int responseCode = connection.getResponseCode();
         if (responseCode != 200)
         {
-            throw new IOException("Ответ от API: " + responseCode + " (возможно, на выбранную дату нет данных)");
+            throw new IOException("Message from API: " + responseCode + " (check day month and year, mb u r looking into the future)");
         }
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
