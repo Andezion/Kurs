@@ -17,7 +17,7 @@ public class Kurs extends Application
         Scene scene = new Scene(fxmlLoader.load(), 1000, 600);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(
                 "/com/example/kurs/my_style.css")).toExternalForm());
-        stage.setTitle("roma topchik");
+        stage.setTitle("Exchange Rate");
         stage.setScene(scene);
         stage.show();
     }
