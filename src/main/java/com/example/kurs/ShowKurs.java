@@ -93,10 +93,10 @@ public class ShowKurs
             switch (period)
             {
                 case "Now":
-                    result = getCurrentRate(from);
+                    result = get_current(from);
                     break;
                 case "Today":
-                    result = getTodayRate(from);
+                    result = get_today(from);
                     break;
                 case "Last N days":
                     String text = daysField.getText();
@@ -112,7 +112,7 @@ public class ShowKurs
                             }
                             else
                             {
-                                result = getLastNDaysRates(from, days);
+                                result = get_last_n_days(from, days);
                             }
                         }
                         catch (NumberFormatException e)
@@ -129,7 +129,7 @@ public class ShowKurs
                     if (specificDatePicker.getValue() != null)
                     {
                         String date = specificDatePicker.getValue().toString();
-                        result = getRateForDate(from, date);
+                        result = get_day(from, date);
                     }
                     else
                     {
@@ -141,7 +141,7 @@ public class ShowKurs
                     {
                         String start = startDatePicker.getValue().toString();
                         String end = endDatePicker.getValue().toString();
-                        result = getRatesForPeriod(from, start, end);
+                        result = get_period(from, start, end);
                     }
                     else
                     {
@@ -161,7 +161,7 @@ public class ShowKurs
         }
     }
 
-    private void updateChart(JSONArray rates, String currency)
+    private void show_cool(JSONArray rates, String currency)
     {
         rateChart.getData().clear();
         XYChart.Series<String, Number> series = new XYChart.Series<>();
@@ -199,13 +199,13 @@ public class ShowKurs
         rateChart.getData().add(series);
     }
 
-    private String getRatesForPeriod(String currency, String startDate, String endDate) throws IOException
+    private String get_period(String currency, String startDate, String endDate) throws IOException
     {
         String url = "https://api.nbp.pl/api/exchangerates/rates/a/" + currency.toLowerCase() + "/" + startDate + "/" + endDate + "/?format=json";
-        JSONObject json = getJsonObject(url);
+        JSONObject json = get_data_from_url(url);
         JSONArray rates = json.getJSONArray("rates");
 
-        updateChart(rates, currency);
+        show_cool(rates, currency);
 
         StringBuilder result = new StringBuilder("Exchange rate " + currency + " to PLN for period:\n");
         for (int i = 0; i < rates.length(); i++)
@@ -219,37 +219,37 @@ public class ShowKurs
         return result.toString();
     }
 
-    private String getRateForDate(String currency, String date) throws IOException
+    private String get_day(String currency, String date) throws IOException
     {
         String url = "https://api.nbp.pl/api/exchangerates/rates/a/" + currency.toLowerCase() + "/" + date + "/?format=json";
-        JSONObject json = getJsonObject(url);
+        JSONObject json = get_data_from_url(url);
         JSONObject rate = json.getJSONArray("rates").getJSONObject(0);
         return "Exchange rate " + currency + " to PLN on " + rate.getString("effectiveDate") + ": " + rate.getDouble("mid") + " PLN";
     }
 
-    private String getCurrentRate(String currency) throws IOException
+    private String get_current(String currency) throws IOException
     {
         String url = "https://api.nbp.pl/api/exchangerates/rates/a/" + currency.toLowerCase() + "/today/?format=json";
-        JSONObject json = getJsonObject(url);
+        JSONObject json = get_data_from_url(url);
         JSONObject rate = json.getJSONArray("rates").getJSONObject(0);
         return "Current rate " + currency + " to PLN: " + rate.getDouble("mid") + " PLN";
     }
 
-    private String getTodayRate(String currency) throws IOException
+    private String get_today(String currency) throws IOException
     {
         String url = "https://api.nbp.pl/api/exchangerates/rates/a/" + currency.toLowerCase() + "/?format=json";
-        JSONObject json = getJsonObject(url);
+        JSONObject json = get_data_from_url(url);
         JSONObject rate = json.getJSONArray("rates").getJSONObject(0);
         return "Exchange rate " + currency + " to PLN on today: " + rate.getDouble("mid") + " PLN";
     }
 
-    private String getLastNDaysRates(String currency, int days) throws IOException
+    private String get_last_n_days(String currency, int days) throws IOException
     {
         String url = "https://api.nbp.pl/api/exchangerates/rates/a/" + currency.toLowerCase() + "/last/" + days + "/?format=json";
-        JSONObject json = getJsonObject(url);
+        JSONObject json = get_data_from_url(url);
         JSONArray rates = json.getJSONArray("rates");
 
-        updateChart(rates, currency);
+        show_cool(rates, currency);
 
         StringBuilder result = new StringBuilder("Exchange rate " + currency + " to PLN last " + days + " days:\n");
         for (int i = 0; i < rates.length(); i++)
@@ -264,18 +264,18 @@ public class ShowKurs
     }
 
 
-    private JSONObject getJsonObject(String urlStr) throws IOException
+    private JSONObject get_data_from_url(String urlStr) throws IOException
     {
-        HttpURLConnection connection = (HttpURLConnection) new URL(urlStr).openConnection();
-        connection.setRequestMethod("GET");
+        HttpURLConnection connect_to_url = (HttpURLConnection) new URL(urlStr).openConnection();
+        connect_to_url.setRequestMethod("GET");
 
-        int responseCode = connection.getResponseCode();
-        if (responseCode != 200)
+        int result_code = connect_to_url.getResponseCode();
+        if (result_code != 200)
         {
-            throw new IOException("Message from API: " + responseCode + " (check day month and year, mb u r looking into the future)");
+            throw new IOException("Message from API: " + result_code + " (check day month and year, mb u r looking into the future)");
         }
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connect_to_url.getInputStream()));
         StringBuilder response = new StringBuilder();
         String line;
 
@@ -285,6 +285,7 @@ public class ShowKurs
         }
 
         reader.close();
+
         return new JSONObject(response.toString());
     }
 }
