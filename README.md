@@ -76,9 +76,73 @@ private void show_cool(JSONArray rates, String currency)
     }
 ```
 
-Initially, this is a function that only fills the chart with the rate to date, but in order to show changes in the chart in more detail - I decided 
-to slightly change the division price of the rate axis. Now we are looking for the minimum and maximum value of the exchange rate and the beginning of 
-the exchange rate axis is now slightly less than its minimum value for this period, and thanks to this approach we can always clearly see the drops and rises of the exchange rate, even the minimum ones
+Initially, this is a function that only fills the chart with the rate to date, but in order to show changes in the chart in more detail - I decided to slightly change the division price of the rate axis. Now we are looking for the minimum and maximum value of the exchange rate and the beginning of the exchange rate axis is now slightly less than its minimum value for this period, and thanks to this approach we can always clearly see the drops and rises of the exchange rate, even the minimum ones!
+
+Next we have the main logical functions - which just send a request to our server with currency history. They all look almost the same, only the requests and the type of filling in the response differ, because sometimes we get one date and rate value, and sometimes a whole array! Also we have processed the possibility of viewing the rate for Saturday and Sunday, despite the fact that on those days the rate is not updated.
+
+Now comes the main function - the function that returns the response from the server:
+```
+private JSONObject get_data_from_url(String urlStr) throws IOException
+    {
+        LocalDate currentDate = LocalDate.now();
+        DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
+
+        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY)
+        {
+            LocalDate lastFriday = currentDate.with(DayOfWeek.FRIDAY);
+
+            urlStr = urlStr.replace("today", lastFriday.toString());
+        }
+
+        HttpURLConnection connect_to_url = (HttpURLConnection) new URL(urlStr).openConnection();
+        connect_to_url.setRequestMethod("GET");
+
+        int result_code = connect_to_url.getResponseCode();
+        if (result_code != 200)
+        {
+            throw new IOException("Message from API: " + result_code + " (check day month and year, mb u r looking into the future)");
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connect_to_url.getInputStream()));
+        StringBuilder response = new StringBuilder();
+        String line;
+
+        while ((line = reader.readLine()) != null)
+        {
+            response.append(line);
+        }
+
+        reader.close();
+
+        return new JSONObject(response.toString());
+    }
+```
+First we throw our request to the server, the server checks the correctness of our request and if it is correct, it returns an error, which we process. If all is well, we write the response into a buffer, from which we write it line by line into our string. After that we close the buffer and return the data to the user in JSON format.
+
+In the Kurs file, we just put it all together, namely logic, markup, and styles. We also run everything through this file.
+```
+public class Kurs extends Application
+{
+    @Override
+    public void start(Stage stage) throws IOException
+    {
+        FXMLLoader fxmlLoader = new FXMLLoader(Kurs.class.getResource("hello-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 1000, 600);
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(
+                "/com/example/kurs/my_style.css")).toExternalForm());
+        stage.setTitle("Exchange Rate");
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    public static void main(String[] args)
+    {
+        launch();
+    }
+}
+```
+
+
 
 
 
