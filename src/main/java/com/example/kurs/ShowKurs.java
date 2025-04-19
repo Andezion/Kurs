@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 
 
 public class ShowKurs
@@ -221,7 +223,14 @@ public class ShowKurs
 
     private String get_day(String currency, String date) throws IOException
     {
-        String url = "https://api.nbp.pl/api/exchangerates/rates/a/" + currency.toLowerCase() + "/" + date + "/?format=json";
+        LocalDate requestedDate = LocalDate.parse(date);
+
+        if (requestedDate.getDayOfWeek() == DayOfWeek.SATURDAY || requestedDate.getDayOfWeek() == DayOfWeek.SUNDAY)
+        {
+            requestedDate = requestedDate.with(DayOfWeek.FRIDAY);
+        }
+
+        String url = "https://api.nbp.pl/api/exchangerates/rates/a/" + currency.toLowerCase() + "/" + requestedDate + "/?format=json";
         JSONObject json = get_data_from_url(url);
         JSONObject rate = json.getJSONArray("rates").getJSONObject(0);
         return "Exchange rate " + currency + " to PLN on " + rate.getString("effectiveDate") + ": " + rate.getDouble("mid") + " PLN";
@@ -266,6 +275,16 @@ public class ShowKurs
 
     private JSONObject get_data_from_url(String urlStr) throws IOException
     {
+        LocalDate currentDate = LocalDate.now();
+        DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
+
+        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY)
+        {
+            LocalDate lastFriday = currentDate.with(DayOfWeek.FRIDAY);
+
+            urlStr = urlStr.replace("today", lastFriday.toString());
+        }
+
         HttpURLConnection connect_to_url = (HttpURLConnection) new URL(urlStr).openConnection();
         connect_to_url.setRequestMethod("GET");
 
