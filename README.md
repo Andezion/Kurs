@@ -6,7 +6,6 @@ Currency exchange rate tracker
 * [Demonstration](#demonstration)
 * [Technologies](#technologies)
 * [Features](#features)
-* [Inspiration](#inspiration)
 * [Setup](#setup)
 ---
 
@@ -142,6 +141,9 @@ public class Kurs extends Application
 }
 ```
 
+---
+## Setup
+Just install the latest Release :)
 
 
 
