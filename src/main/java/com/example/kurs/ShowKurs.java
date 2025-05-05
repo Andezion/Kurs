@@ -208,13 +208,16 @@ public class ShowKurs
     {
         LocalDate start = LocalDate.parse(startDate);
         LocalDate end = LocalDate.parse(endDate);
+
         StringBuilder result = new StringBuilder("Exchange rate " + currency + " to PLN for period:\n");
 
-        JSONArray allRates = new JSONArray(); // общий массив для всех периодов
+        JSONArray allRates = new JSONArray();
 
-        while (!start.isAfter(end)) {
+        while (!start.isAfter(end))
+        {
             LocalDate chunkEnd = start.plusDays(92);
-            if (chunkEnd.isAfter(end)) {
+            if (chunkEnd.isAfter(end))
+            {
                 chunkEnd = end;
             }
 
@@ -224,19 +227,18 @@ public class ShowKurs
             JSONObject json = get_data_from_url(url);
             JSONArray rates = json.getJSONArray("rates");
 
-            // Добавляем каждый элемент из текущего блока в общий массив
-            for (int i = 0; i < rates.length(); i++) {
+            for (int i = 0; i < rates.length(); i++)
+            {
                 allRates.put(rates.getJSONObject(i));
             }
 
             start = chunkEnd.plusDays(1);
         }
 
-        // Отображаем график один раз по всем собранным данным
         show_cool(allRates, currency);
 
-        // Заполняем текстовый результат
-        for (int i = 0; i < allRates.length(); i++) {
+        for (int i = 0; i < allRates.length(); i++)
+        {
             JSONObject rateObj = allRates.getJSONObject(i);
             result.append(rateObj.getString("effectiveDate"))
                     .append(": ")
