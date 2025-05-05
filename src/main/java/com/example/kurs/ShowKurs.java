@@ -206,22 +206,61 @@ public class ShowKurs
 
     private String get_period(String currency, String startDate, String endDate) throws IOException
     {
-        String url = "https://api.nbp.pl/api/exchangerates/rates/a/" + currency.toLowerCase() + "/" + startDate + "/" + endDate + "/?format=json";
-        JSONObject json = get_data_from_url(url);
-        JSONArray rates = json.getJSONArray("rates");
-
-        show_cool(rates, currency);
-
+        LocalDate start = LocalDate.parse(startDate);
+        LocalDate end = LocalDate.parse(endDate);
         StringBuilder result = new StringBuilder("Exchange rate " + currency + " to PLN for period:\n");
-        for (int i = 0; i < rates.length(); i++)
-        {
-            JSONObject rateObj = rates.getJSONObject(i);
+
+        JSONArray allRates = new JSONArray(); // общий массив для всех периодов
+
+        while (!start.isAfter(end)) {
+            LocalDate chunkEnd = start.plusDays(92);
+            if (chunkEnd.isAfter(end)) {
+                chunkEnd = end;
+            }
+
+            String url = "https://api.nbp.pl/api/exchangerates/rates/a/"
+                    + currency.toLowerCase() + "/" + start + "/" + chunkEnd + "/?format=json";
+
+            JSONObject json = get_data_from_url(url);
+            JSONArray rates = json.getJSONArray("rates");
+
+            // Добавляем каждый элемент из текущего блока в общий массив
+            for (int i = 0; i < rates.length(); i++) {
+                allRates.put(rates.getJSONObject(i));
+            }
+
+            start = chunkEnd.plusDays(1);
+        }
+
+        // Отображаем график один раз по всем собранным данным
+        show_cool(allRates, currency);
+
+        // Заполняем текстовый результат
+        for (int i = 0; i < allRates.length(); i++) {
+            JSONObject rateObj = allRates.getJSONObject(i);
             result.append(rateObj.getString("effectiveDate"))
                     .append(": ")
                     .append(rateObj.getDouble("mid"))
                     .append(" PLN\n");
         }
+
         return result.toString();
+//        String url = "https://api.nbp.pl/api/exchangerates/rates/a/" + currency.toLowerCase() + "/" + startDate + "/" + endDate + "/?format=json";
+//        JSONObject json = get_data_from_url(url);
+//        JSONArray rates = json.getJSONArray("rates");
+//
+//        show_cool(rates, currency);
+//
+//        StringBuilder result = new StringBuilder("Exchange rate " + currency + " to PLN for period:\n");
+//        for (int i = 0; i < rates.length(); i++)
+//        {
+//            JSONObject rateObj = rates.getJSONObject(i);
+//            result.append(rateObj.getString("effectiveDate"))
+//                    .append(": ")
+//                    .append(rateObj.getDouble("mid"))
+//                    .append(" PLN\n");
+//        }
+//        return result.toString();
     }
 
     private String get_day(String currency, String date) throws IOException
