@@ -17,6 +17,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.Locale;
 
 
 public class ShowKurs
@@ -46,6 +47,8 @@ public class ShowKurs
     @FXML
     public void initialize()
     {
+        Locale.setDefault(Locale.ENGLISH);
+
         fromCurrencyBox.getItems().addAll("EUR", "USD", "GBP", "CHF", "JPY");
         toCurrencyBox.getItems().addAll("PLN");
         periodBox.getItems().addAll("Now", "Today", "Last N days", "For the date", "Custom period");
