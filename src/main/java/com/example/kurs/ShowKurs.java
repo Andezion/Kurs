@@ -247,22 +247,6 @@ public class ShowKurs
         }
 
         return result.toString();
-//        String url = "https://api.nbp.pl/api/exchangerates/rates/a/" + currency.toLowerCase() + "/" + startDate + "/" + endDate + "/?format=json";
-//        JSONObject json = get_data_from_url(url);
-//        JSONArray rates = json.getJSONArray("rates");
-//
-//        show_cool(rates, currency);
-//
-//        StringBuilder result = new StringBuilder("Exchange rate " + currency + " to PLN for period:\n");
-//        for (int i = 0; i < rates.length(); i++)
-//        {
-//            JSONObject rateObj = rates.getJSONObject(i);
-//            result.append(rateObj.getString("effectiveDate"))
-//                    .append(": ")
-//                    .append(rateObj.getDouble("mid"))
-//                    .append(" PLN\n");
-//        }
-//        return result.toString();
     }
 
     private String get_day(String currency, String date) throws IOException
@@ -298,16 +282,32 @@ public class ShowKurs
 
     private String get_last_n_days(String currency, int days) throws IOException
     {
-        String url = "https://api.nbp.pl/api/exchangerates/rates/a/" + currency.toLowerCase() + "/last/" + days + "/?format=json";
-        JSONObject json = get_data_from_url(url);
-        JSONArray rates = json.getJSONArray("rates");
-
-        show_cool(rates, currency);
-
         StringBuilder result = new StringBuilder("Exchange rate " + currency + " to PLN last " + days + " days:\n");
-        for (int i = 0; i < rates.length(); i++)
-        {
-            JSONObject rateObj = rates.getJSONObject(i);
+        JSONArray allRates = new JSONArray();
+
+        LocalDate endDate = LocalDate.now();
+        while (days > 0) {
+            int chunk = Math.min(days, 92);
+            LocalDate startDate = endDate.minusDays(chunk);
+
+            String url = "https://api.nbp.pl/api/exchangerates/rates/a/" +
+                    currency.toLowerCase() + "/" +
+                    startDate + "/" + endDate + "/?format=json";
+
+            JSONObject json = get_data_from_url(url);
+            JSONArray rates = json.getJSONArray("rates");
+            for (int i = 0; i < rates.length(); i++) {
+                allRates.put(rates.getJSONObject(i));
+            }
+
+            // подготовка к следующей итерации
+            days -= chunk;
+            endDate = startDate.minusDays(1);
+        }
+
+        show_cool(allRates, currency);
+        for (int i = 0; i < allRates.length(); i++) {
+            JSONObject rateObj = allRates.getJSONObject(i);
             result.append(rateObj.getString("effectiveDate"))
                     .append(": ")
                     .append(rateObj.getDouble("mid"))
